@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LicenseType {
+  Standalone
+  Subscription
+}
+
+enum ClinicStatus {
+  Active
+  Inactive
+}
+
+enum LicenseStatus {
+  Active
+  Expired
+  Revoked
+}
+
+model AdminUser {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  logs      AuditLog[]
+}
+
+model Clinic {
+  id                Int           @id @default(autoincrement())
+  name              String
+  domain            String        @unique
+  dbConnectionString String?
+  licenseType       LicenseType
+  adminContact      String
+  status            ClinicStatus  @default(Active)
+  supportExpiry     DateTime
+  lastVerified      DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  licenses          License[]
+}
+
+model License {
+  id            Int           @id @default(autoincrement())
+  clinicId      Int
+  clinic        Clinic        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  key           String        @unique
+  type          LicenseType
+  version       String        @default("1.0")
+  price         Float?        // License price in USD
+  activationDate DateTime     @default(now())
+  supportExpiry DateTime
+  status        LicenseStatus @default(Active)
+  lastVerified  DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model AuditLog {
+  id          Int       @id @default(autoincrement())
+  timestamp   DateTime @default(now())
+  adminUserId Int
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id])
+  action      String
+  details     String?
+  createdAt   DateTime @default(now())
+}
+
+model GlobalSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PricingPlan {
+  id            String   @id @default(cuid())
+  name          String
+  type          LicenseType
+  monthlyPrice  Int      // Price in cents (MXN * 100)
+  yearlyPrice   Int      // Price in cents (MXN * 100)
+  description   String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("pricing_plans")
+}

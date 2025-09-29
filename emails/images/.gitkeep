@@ -1,0 +1,5 @@
+# This file ensures the images directory is tracked by Git
+
+# Place your logo files here (logo.png, logo.jpg, etc.)
+
+# For production, host images on a CDN and reference via HTTPS URLs
