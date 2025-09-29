@@ -1204,7 +1204,7 @@ function NewLicenseModal({ clinics, onSave, onCancel }: NewLicenseModalProps) {
 
   // Apply template to form
   const applyTemplate = async (templateId: string) => {
-    if (!templateId) {
+    if (!templateId || templateId === "custom") {
       setSelectedTemplate("");
       return;
     }
@@ -1347,7 +1347,7 @@ function NewLicenseModal({ clinics, onSave, onCancel }: NewLicenseModalProps) {
                 <SelectValue placeholder="Choose a template or customize manually" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Custom Configuration</SelectItem>
+                <SelectItem value="custom">Custom Configuration</SelectItem>
                 {LICENSE_TEMPLATES.map((template) => (
                   <SelectItem key={template.id} value={template.id}>
                     {template.name} - {template.description}
