@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "../../../generated/prisma";
-import { SignJWT } from "jose";
+import { SignJWT, jwtVerify } from "jose";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { createPrivateKey, randomUUID, generateKeyPairSync } from "crypto";
+import {
+  createPrivateKey,
+  createPublicKey,
+  randomUUID,
+  generateKeyPairSync,
+} from "crypto";
 import { sendLicenseIssuedEmail } from "../../../lib/email";
 
 const prisma = new PrismaClient();
@@ -153,6 +158,87 @@ export async function PATCH(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to update license" },
+      { status: 500 }
+    );
+  }
+}
+
+// Public endpoint for NullDental to validate licenses
+export async function PUT(request: NextRequest) {
+  try {
+    const { license: licenseToken } = await request.json();
+
+    if (!licenseToken) {
+      return NextResponse.json(
+        { valid: false, error: "License token required" },
+        { status: 400 }
+      );
+    }
+
+    // Import jose for verification
+    const { jwtVerify } = await import("jose");
+
+    // Get public key for verification
+    const publicKeyPem = readFileSync(
+      join(process.cwd(), "keys/public.pem"),
+      "utf8"
+    );
+    const publicKey = createPublicKey(publicKeyPem);
+
+    try {
+      // Verify JWT signature and claims
+      const { payload } = await jwtVerify(licenseToken, publicKey, {
+        issuer: "admin.nulldental.com",
+        audience: "clinic-app",
+      });
+
+      // Check if license exists and is active in database
+      const license = await prisma.license.findUnique({
+        where: { id: payload.licenseId as number },
+        include: { clinic: true },
+      });
+
+      if (!license || !license.clinic) {
+        return NextResponse.json({
+          valid: false,
+          error: "License not found",
+        });
+      }
+
+      // Check if license is expired
+      const now = new Date();
+      if (license.supportExpiry < now) {
+        return NextResponse.json({
+          valid: false,
+          error: "License expired",
+          expired: true,
+        });
+      }
+
+      // Return validation result with license details
+      return NextResponse.json({
+        valid: true,
+        license: {
+          id: license.id,
+          clinicId: license.clinicId,
+          clinicName: license.clinic.name,
+          clinicDomain: license.clinic.domain,
+          type: license.type,
+          version: license.version,
+          activationDate: license.activationDate,
+          supportExpiry: license.supportExpiry,
+        },
+      });
+    } catch (verifyError) {
+      return NextResponse.json({
+        valid: false,
+        error: "Invalid license signature",
+      });
+    }
+  } catch (error) {
+    console.error("License validation error:", error);
+    return NextResponse.json(
+      { valid: false, error: "Validation failed" },
       { status: 500 }
     );
   }
