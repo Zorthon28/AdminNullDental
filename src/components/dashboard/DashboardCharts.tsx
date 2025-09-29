@@ -49,7 +49,7 @@ const DashboardCharts = ({
 }: DashboardChartsProps) => {
   const [licenseView, setLicenseView] = useState<"pie" | "donut">("donut");
   const [timelineView, setTimelineView] = useState<"monthly" | "quarterly">(
-    "monthly",
+    "monthly"
   );
 
   // Transform license data for pie chart
@@ -122,7 +122,7 @@ const DashboardCharts = ({
                   cy="50%"
                   labelLine={false}
                   label={({ name, percent }) =>
-                    `${name}: ${(percent * 100).toFixed(0)}%`
+                    `${name}: ${(Number(percent) * 100).toFixed(0)}%`
                   }
                   outerRadius={licenseView === "pie" ? 100 : 100}
                   innerRadius={licenseView === "donut" ? 60 : 0}
