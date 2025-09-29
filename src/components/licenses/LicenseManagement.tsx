@@ -60,6 +60,8 @@ import {
   getPlansByType,
   formatCurrency,
   getPricingPlan,
+  getPricingPlans,
+  type PricingPlan,
 } from "@/lib/pricing";
 
 // License Templates
@@ -1137,9 +1139,11 @@ function NewLicenseModal({ clinics, onSave, onCancel }: NewLicenseModalProps) {
   const [isLoadingSettings, setIsLoadingSettings] = useState(true);
   const [selectedPlanDescription, setSelectedPlanDescription] =
     useState<string>("");
+  const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>([]);
 
   useEffect(() => {
     loadGlobalSettings();
+    loadPricingPlans();
   }, []);
 
   const loadGlobalSettings = async () => {
@@ -1171,6 +1175,15 @@ function NewLicenseModal({ clinics, onSave, onCancel }: NewLicenseModalProps) {
       console.error("Failed to load global settings:", error);
     } finally {
       setIsLoadingSettings(false);
+    }
+  };
+
+  const loadPricingPlans = async () => {
+    try {
+      const plans = await getPricingPlans();
+      setPricingPlans(plans);
+    } catch (error) {
+      console.error("Failed to load pricing plans:", error);
     }
   };
 
@@ -1404,7 +1417,7 @@ function NewLicenseModal({ clinics, onSave, onCancel }: NewLicenseModalProps) {
               <SelectValue placeholder="Select a pricing plan" />
             </SelectTrigger>
             <SelectContent>
-              {PRICING_PLANS.map((plan) => (
+              {pricingPlans.map((plan) => (
                 <SelectItem key={plan.id} value={plan.id}>
                   {plan.name} - {formatCurrency(plan.monthlyPrice)}
                   {plan.type === "Subscription" && " (Monthly)"}
