@@ -1,19 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "../../../generated/prisma";
 import { SignJWT } from "jose";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { createPrivateKey, randomUUID } from "crypto";
+import { createPrivateKey, randomUUID, generateKeyPairSync } from "crypto";
 import { sendLicenseIssuedEmail } from "../../../lib/email";
 
 const prisma = new PrismaClient();
 
-// Load private key
-const privateKeyPem = readFileSync(
-  join(process.cwd(), "keys/private.pem"),
-  "utf8"
-);
-const privateKey = createPrivateKey(privateKeyPem);
+// Function to get or create private key
+function getPrivateKey() {
+  const keyPath = join(process.cwd(), "keys/private.pem");
+
+  if (!existsSync(keyPath)) {
+    // Generate keys if they don't exist
+    const { privateKey, publicKey } = generateKeyPairSync("ec", {
+      namedCurve: "prime256v1",
+      publicKeyEncoding: {
+        type: "spki",
+        format: "pem",
+      },
+      privateKeyEncoding: {
+        type: "pkcs8",
+        format: "pem",
+      },
+    });
+
+    // Write to files (this will work in development, but may not in production)
+    try {
+      const fs = require("fs");
+      const keysDir = join(process.cwd(), "keys");
+      if (!fs.existsSync(keysDir)) {
+        fs.mkdirSync(keysDir, { recursive: true });
+      }
+      fs.writeFileSync(keyPath, privateKey);
+      fs.writeFileSync(join(process.cwd(), "keys/public.pem"), publicKey);
+    } catch (error) {
+      console.warn("Could not write keys to disk, using in-memory keys");
+    }
+
+    return createPrivateKey(privateKey);
+  }
+
+  const privateKeyPem = readFileSync(keyPath, "utf8");
+  return createPrivateKey(privateKeyPem);
+}
 
 export async function GET() {
   try {
@@ -45,6 +76,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Generate signed JWT
+    const privateKey = getPrivateKey();
     const jwt = await new SignJWT({
       licenseId: license.id,
       clinicId: license.clinicId,
