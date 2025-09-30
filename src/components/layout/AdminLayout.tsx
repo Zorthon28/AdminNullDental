@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useToast } from "@/components/ui/toast-system";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 interface SidebarProps {
   activeSection?: string;
@@ -231,6 +232,9 @@ export function Header({ title }: HeaderProps) {
         </div>
 
         <div className="flex items-center space-x-6">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -76,6 +76,12 @@ interface GlobalSettings {
   supportExpiryWarningDays: number;
   licenseExpiryWarningDays: number;
   adminEmailAddress: string;
+
+  // Push Notification Settings
+  pushNotificationsEnabled: boolean;
+  pushLicenseExpiryAlerts: boolean;
+  pushSystemAlerts: boolean;
+  pushNewClinicAlerts: boolean;
 }
 
 const defaultSettings: GlobalSettings = {
@@ -101,6 +107,10 @@ const defaultSettings: GlobalSettings = {
   supportExpiryWarningDays: 30,
   licenseExpiryWarningDays: 14,
   adminEmailAddress: "admin@nulldental.com",
+  pushNotificationsEnabled: false,
+  pushLicenseExpiryAlerts: true,
+  pushSystemAlerts: true,
+  pushNewClinicAlerts: false,
 };
 
 export default function GlobalSettings() {
@@ -1235,6 +1245,95 @@ export default function GlobalSettings() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Push Notification Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Bell className="h-5 w-5 mr-2" />
+              Push Notifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Enable Push Notifications</Label>
+                <div className="text-sm text-gray-500">
+                  Receive browser notifications for important events
+                </div>
+              </div>
+              <Switch
+                checked={settings.pushNotificationsEnabled}
+                onCheckedChange={(checked) =>
+                  updateSetting("pushNotificationsEnabled", checked)
+                }
+              />
+            </div>
+
+            <Separator />
+
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Notification Types</Label>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="push-license-expiry"
+                  checked={settings.pushLicenseExpiryAlerts}
+                  onCheckedChange={(checked) =>
+                    updateSetting("pushLicenseExpiryAlerts", checked as boolean)
+                  }
+                  disabled={!settings.pushNotificationsEnabled}
+                />
+                <Label
+                  htmlFor="push-license-expiry"
+                  className={`text-sm ${
+                    !settings.pushNotificationsEnabled ? "text-gray-400" : ""
+                  }`}
+                >
+                  License Expiry Alerts
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="push-system-alerts"
+                  checked={settings.pushSystemAlerts}
+                  onCheckedChange={(checked) =>
+                    updateSetting("pushSystemAlerts", checked as boolean)
+                  }
+                  disabled={!settings.pushNotificationsEnabled}
+                />
+                <Label
+                  htmlFor="push-system-alerts"
+                  className={`text-sm ${
+                    !settings.pushNotificationsEnabled ? "text-gray-400" : ""
+                  }`}
+                >
+                  System Alerts & Errors
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="push-new-clinic"
+                  checked={settings.pushNewClinicAlerts}
+                  onCheckedChange={(checked) =>
+                    updateSetting("pushNewClinicAlerts", checked as boolean)
+                  }
+                  disabled={!settings.pushNotificationsEnabled}
+                />
+                <Label
+                  htmlFor="push-new-clinic"
+                  className={`text-sm ${
+                    !settings.pushNotificationsEnabled ? "text-gray-400" : ""
+                  }`}
+                >
+                  New Clinic Registrations
+                </Label>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Advanced License Features */}
         <Card>
