@@ -74,9 +74,20 @@ hq/hFp7AQFKTbrM24vA2N63Pl7e1zeNjMaXLnBuRuPr5Q5OrUHrXAu+7rw==
       return res.status(400).json({ valid: false, error: "License revoked" });
     }
 
+    // Check if this is the first activation
+    const isFirstActivation = !licenseRecord.firstActivated;
+    if (isFirstActivation) {
+      // Update firstActivated timestamp
+      await prisma.license.update({
+        where: { id: licenseRecord.id },
+        data: { firstActivated: new Date() },
+      });
+    }
+
     // Return validation result with license details
     return res.status(200).json({
       valid: true,
+      firstActivation: isFirstActivation,
       license: {
         id: licenseRecord.id,
         clinicId: licenseRecord.clinicId,
@@ -85,6 +96,9 @@ hq/hFp7AQFKTbrM24vA2N63Pl7e1zeNjMaXLnBuRuPr5Q5OrUHrXAu+7rw==
         type: licenseRecord.type,
         version: licenseRecord.version,
         activationDate: licenseRecord.activationDate,
+        firstActivated: isFirstActivation
+          ? new Date().toISOString()
+          : licenseRecord.firstActivated?.toISOString(),
         supportExpiry: licenseRecord.supportExpiry,
       },
     });

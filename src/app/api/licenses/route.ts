@@ -217,9 +217,20 @@ export async function PUT(request: NextRequest) {
         });
       }
 
+      // Check if this is the first activation
+      const isFirstActivation = !license.firstActivated;
+      if (isFirstActivation) {
+        // Update firstActivated timestamp
+        await prisma.license.update({
+          where: { id: license.id },
+          data: { firstActivated: now },
+        });
+      }
+
       // Return validation result with license details
       return NextResponse.json({
         valid: true,
+        firstActivation: isFirstActivation,
         license: {
           id: license.id,
           clinicId: license.clinicId,
@@ -228,6 +239,9 @@ export async function PUT(request: NextRequest) {
           type: license.type,
           version: license.version,
           activationDate: license.activationDate,
+          firstActivated: isFirstActivation
+            ? now.toISOString()
+            : license.firstActivated?.toISOString(),
           supportExpiry: license.supportExpiry,
         },
       });

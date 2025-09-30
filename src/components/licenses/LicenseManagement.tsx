@@ -126,6 +126,7 @@ interface License {
   type: "Standalone" | "Subscription";
   version: string;
   activationDate: string;
+  firstActivated: string | null;
   supportExpiry: string;
   status: "Active" | "Expired" | "Revoked";
   lastVerified: string | null;
@@ -465,11 +466,11 @@ export default function LicenseManagement() {
     // Export functionality - download CSV
     const csvContent =
       "data:text/csv;charset=utf-8," +
-      "Clinic Name,License Key,Type,Version,Activation Date,Support Expiry,Status,Last Verified\n" +
+      "Clinic Name,License Key,Type,Version,Activation Date,First Activated,Support Expiry,Status,Last Verified\n" +
       filteredLicenses
         .map(
           (license) =>
-            `"${license.clinic.name}","${license.key}","${license.type}","${license.version}","${license.activationDate}","${license.supportExpiry}","${license.status}","${license.lastVerified || ""}"`
+            `"${license.clinic.name}","${license.key}","${license.type}","${license.version}","${license.activationDate}","${license.firstActivated || ""}","${license.supportExpiry}","${license.status}","${license.lastVerified || ""}"`
         )
         .join("\n");
 
@@ -509,6 +510,7 @@ export default function LicenseManagement() {
         "Type",
         "Version",
         "Activation Date",
+        "First Activated",
         "Support Expiry",
         "Status",
       ];
@@ -536,6 +538,7 @@ export default function LicenseManagement() {
           type,
           version,
           activationDate,
+          firstActivated,
           supportExpiry,
           status,
         ] = values;
@@ -560,15 +563,24 @@ export default function LicenseManagement() {
           });
 
           if (response.ok) {
-            // If status is not Active, update it after creation
+            const createdLicense = await response.json();
+
+            // Update status and firstActivated if needed
+            const updates: any = {};
             if (status !== "Active") {
-              const createdLicense = await response.json();
+              updates.status = status as "Active" | "Expired" | "Revoked";
+            }
+            if (firstActivated && firstActivated.trim()) {
+              updates.firstActivated = new Date(firstActivated).toISOString();
+            }
+
+            if (Object.keys(updates).length > 0) {
               await fetch("/api/licenses", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   id: createdLicense.id,
-                  status: status as "Active" | "Expired" | "Revoked",
+                  ...updates,
                 }),
               });
             }
@@ -737,6 +749,7 @@ export default function LicenseManagement() {
                 <TableHead>Type</TableHead>
                 <TableHead>Version</TableHead>
                 <TableHead>Activation Date</TableHead>
+                <TableHead>First Activated</TableHead>
                 <TableHead>Support Expiry</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Last Verified</TableHead>
@@ -792,6 +805,24 @@ export default function LicenseManagement() {
                     </TableCell>
                     <TableCell>{license.version}</TableCell>
                     <TableCell>{license.activationDate}</TableCell>
+                    <TableCell>
+                      {license.firstActivated ? (
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-green-500 hover:bg-green-600 text-white text-xs">
+                            Activated
+                          </Badge>
+                          <span className="text-sm text-gray-600">
+                            {new Date(
+                              license.firstActivated
+                            ).toLocaleDateString()}
+                          </span>
+                        </div>
+                      ) : (
+                        <Badge variant="outline" className="text-gray-500">
+                          Not Activated
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell
                       className={
                         isExpiringSoon && license.status === "Active"

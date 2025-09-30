@@ -63,6 +63,7 @@ model License {
   version       String        @default("1.0")
   price         Float?        // License price in USD
   activationDate DateTime     @default(now())
+  firstActivated DateTime?    // First time the license was validated by a clinic
   supportExpiry DateTime
   status        LicenseStatus @default(Active)
   lastVerified  DateTime?
