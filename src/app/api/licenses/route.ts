@@ -163,6 +163,12 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
+// ES256 Public Key for JWT verification
+const PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEDMqAf0Y3alNfzI1+BLNBAyRIjf78
+hq/hFp7AQFKTbrM24vA2N63Pl7e1zeNjMaXLnBuRuPr5Q5OrUHrXAu+7rw==
+-----END PUBLIC KEY-----`;
+
 // Public endpoint for NullDental to validate licenses
 export async function PUT(request: NextRequest) {
   try {
@@ -179,11 +185,7 @@ export async function PUT(request: NextRequest) {
     const { jwtVerify } = await import("jose");
 
     // Get public key for verification
-    const publicKeyPem = readFileSync(
-      join(process.cwd(), "keys/public.pem"),
-      "utf8"
-    );
-    const publicKey = createPublicKey(publicKeyPem);
+    const publicKey = createPublicKey(PUBLIC_KEY_PEM);
 
     try {
       // Verify JWT signature and claims
