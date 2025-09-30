@@ -70,11 +70,13 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   ];
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+    <div className="w-64 bg-card border-r border-border flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-bold text-blue-600">NullDental</h2>
-        <p className="text-sm text-gray-500">Admin Portal</p>
+      <div className="p-6 border-b border-border">
+        <h2 className="text-xl font-bold text-blue-600 dark:text-blue-400">
+          NullDental
+        </h2>
+        <p className="text-sm text-muted-foreground">Admin Portal</p>
       </div>
 
       {/* Navigation */}
@@ -90,12 +92,12 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
                   href={item.path}
                   className={`w-full flex items-center px-3 py-2 text-left rounded-lg transition-colors ${
                     isActive
-                      ? "bg-blue-50 text-blue-700 border border-blue-200"
-                      : "text-gray-700 hover:bg-gray-50"
+                      ? "bg-accent text-accent-foreground border border-border"
+                      : "text-foreground hover:bg-accent/50"
                   }`}
                 >
                   <Icon
-                    className={`h-5 w-5 mr-3 ${isActive ? "text-blue-600" : "text-gray-400"}`}
+                    className={`h-5 w-5 mr-3 ${isActive ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground"}`}
                   />
                   {item.label}
                 </Link>
@@ -106,16 +108,16 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
       </nav>
 
       {/* User Profile */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-border">
         <div className="flex items-center space-x-3 mb-3">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <User className="h-4 w-4 text-blue-600" />
+          <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+            <User className="h-4 w-4 text-accent-foreground" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-foreground">
               {user?.username || "Admin User"}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {user?.role || "Administrator"}
             </p>
           </div>
@@ -123,7 +125,7 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
         <Button
           variant="ghost"
           size="sm"
-          className="w-full justify-start text-gray-600"
+          className="w-full justify-start text-muted-foreground hover:text-foreground"
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4 mr-2" />
@@ -225,10 +227,10 @@ export function Header({ title }: HeaderProps) {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <header className="bg-card border-b border-border px-6 py-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+          <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
         </div>
 
         <div className="flex items-center space-x-6">
@@ -241,12 +243,12 @@ export function Header({ title }: HeaderProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="relative hover:bg-gray-50"
+                className="relative hover:bg-accent/50"
                 title={`${notifications} license${notifications !== 1 ? "s" : ""} expiring soon`}
               >
-                <Bell className="h-5 w-5 text-gray-600" />
+                <Bell className="h-5 w-5 text-muted-foreground" />
                 {notifications > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-red-500 text-white font-medium">
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-destructive text-destructive-foreground font-medium">
                     {notifications > 99 ? "99+" : notifications}
                   </Badge>
                 )}
@@ -273,10 +275,10 @@ export function Header({ title }: HeaderProps) {
                     >
                       <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-foreground truncate">
                           {license.clinic.name}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-muted-foreground">
                           License expires in {daysUntilExpiry} day
                           {daysUntilExpiry !== 1 ? "s" : ""}
                         </p>
@@ -293,23 +295,23 @@ export function Header({ title }: HeaderProps) {
                   >
                     <Info className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-medium text-foreground truncate">
                         {activity.action}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         {new Date(activity.timestamp).toLocaleDateString()}
                       </p>
                     </div>
                   </DropdownMenuItem>
                 ))
               ) : (
-                <DropdownMenuItem className="flex items-center justify-center p-4 text-sm text-gray-500">
+                <DropdownMenuItem className="flex items-center justify-center p-4 text-sm text-muted-foreground">
                   No recent activity
                 </DropdownMenuItem>
               )}
 
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-center text-sm text-blue-600 hover:text-blue-700">
+              <DropdownMenuItem className="text-center text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                 View All {notifications > 0 ? "Licenses" : "Activity"}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -318,11 +320,11 @@ export function Header({ title }: HeaderProps) {
           {/* Current Time & Date */}
           <div className="flex items-center space-x-3 text-right">
             <div className="flex flex-col">
-              <div className="flex items-center space-x-1 text-sm font-medium text-gray-900">
-                <Clock className="h-4 w-4 text-blue-600" />
+              <div className="flex items-center space-x-1 text-sm font-medium text-foreground">
+                <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <span>{formatTime(currentTime)}</span>
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-muted-foreground">
                 {formatDate(currentTime)}
               </div>
             </div>

@@ -24,27 +24,33 @@ interface ThemeProviderProps {
   children: React.ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
+  globalTheme?: Theme;
+  onThemeChange?: (theme: Theme) => void;
 }
 
 export function ThemeProvider({
   children,
   defaultTheme = "system",
   storageKey = "nulldental-theme",
+  globalTheme,
+  onThemeChange,
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(defaultTheme);
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    // Load theme from localStorage
+    // Load theme from localStorage or use global theme
     try {
       const stored = localStorage.getItem(storageKey);
-      if (stored && ["light", "dark", "system"].includes(stored)) {
+      if (globalTheme && ["light", "dark", "system"].includes(globalTheme)) {
+        setTheme(globalTheme);
+      } else if (stored && ["light", "dark", "system"].includes(stored)) {
         setTheme(stored as Theme);
       }
     } catch (error) {
       console.warn("Failed to load theme from localStorage:", error);
     }
-  }, [storageKey]);
+  }, [storageKey, globalTheme]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -93,9 +99,14 @@ export function ThemeProvider({
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme]);
 
+  const handleSetTheme = (newTheme: Theme) => {
+    setTheme(newTheme);
+    onThemeChange?.(newTheme);
+  };
+
   const value = {
     theme,
-    setTheme,
+    setTheme: handleSetTheme,
     resolvedTheme,
   };
 

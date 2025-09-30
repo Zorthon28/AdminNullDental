@@ -11,6 +11,9 @@ import {
   Edit,
   X,
   Bell,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,9 +44,13 @@ import {
 import { useToast } from "@/components/ui/toast-system";
 import { PRICING_PLANS, formatCurrency, type PricingPlan } from "@/lib/pricing";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useTheme } from "@/components/theme/ThemeProvider";
 import { QRCodeCanvas } from "qrcode.react";
 
 interface GlobalSettings {
+  // Theme Settings
+  theme: "light" | "dark" | "system";
+
   // Feature Toggles
   advancedReportsEnabled: boolean;
   automaticBackupsEnabled: boolean;
@@ -86,6 +93,7 @@ interface GlobalSettings {
 }
 
 const defaultSettings: GlobalSettings = {
+  theme: "system",
   advancedReportsEnabled: true,
   automaticBackupsEnabled: false,
   emailNotificationsEnabled: true,
@@ -132,11 +140,19 @@ export default function GlobalSettings() {
   const [confirmDisable2FA, setConfirmDisable2FA] = useState(false);
   const { showError, showSuccess, showWarning } = useToast();
   const { twoFactorEnabled, enableTwoFactor, disableTwoFactor } = useAuth();
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     loadSettings();
     loadPricingPlans();
   }, []);
+
+  // Sync theme setting with theme provider
+  useEffect(() => {
+    if (settings.theme) {
+      setTheme(settings.theme);
+    }
+  }, [settings.theme, setTheme]);
 
   const loadPricingPlans = async () => {
     try {
@@ -382,6 +398,56 @@ export default function GlobalSettings() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Theme Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Sun className="h-5 w-5 mr-2" />
+              Theme Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="theme-select">
+                Application Theme <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={settings.theme}
+                onValueChange={(value: "light" | "dark" | "system") =>
+                  updateSetting("theme", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">
+                    <div className="flex items-center">
+                      <Sun className="h-4 w-4 mr-2" />
+                      Light
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="dark">
+                    <div className="flex items-center">
+                      <Moon className="h-4 w-4 mr-2" />
+                      Dark
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="system">
+                    <div className="flex items-center">
+                      <Monitor className="h-4 w-4 mr-2" />
+                      System
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                Choose your preferred theme or follow system settings
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Feature Toggles */}
         <Card>
           <CardHeader>
