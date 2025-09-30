@@ -351,16 +351,20 @@ function NotificationsList({
         {notifications.map((notification) => (
           <div
             key={notification.id}
-            className={`relative p-4 rounded-lg transition-colors ${notification.read ? "bg-gray-50" : "bg-blue-50"}`}
+            className={`relative p-4 rounded-lg transition-colors ${notification.read ? "bg-muted/30" : "bg-accent/50"}`}
           >
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-medium">{notification.title}</h4>
+                  <h4 className="font-medium text-foreground">
+                    {notification.title}
+                  </h4>
                   {getNotificationBadge(notification.type)}
                 </div>
-                <p className="text-sm text-gray-600">{notification.message}</p>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-sm text-muted-foreground">
+                  {notification.message}
+                </p>
+                <p className="text-xs text-muted-foreground/70 mt-1">
                   {formatRelativeTime(notification.date)}
                 </p>
               </div>

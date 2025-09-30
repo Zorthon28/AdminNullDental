@@ -610,10 +610,10 @@ export default function LicenseManagement() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-foreground">
             License Management
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Manage software licenses and support renewals
           </p>
         </div>
@@ -690,7 +690,7 @@ export default function LicenseManagement() {
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   placeholder="Search by clinic name or license key..."
                   value={searchTerm}
@@ -784,7 +784,7 @@ export default function LicenseManagement() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <code className="text-sm bg-gray-100 px-2 py-1 rounded font-mono">
+                        <code className="text-sm bg-muted px-2 py-1 rounded font-mono">
                           {license.key.length > 40
                             ? `${license.key.substring(0, 20)}...${license.key.substring(license.key.length - 20)}`
                             : license.key}
@@ -811,14 +811,17 @@ export default function LicenseManagement() {
                           <Badge className="bg-green-500 hover:bg-green-600 text-white text-xs">
                             Activated
                           </Badge>
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-muted-foreground">
                             {new Date(
                               license.firstActivated
                             ).toLocaleDateString()}
                           </span>
                         </div>
                       ) : (
-                        <Badge variant="outline" className="text-gray-500">
+                        <Badge
+                          variant="outline"
+                          className="text-muted-foreground"
+                        >
                           Not Activated
                         </Badge>
                       )}
@@ -1128,7 +1131,7 @@ export default function LicenseManagement() {
               </TableBody>
             </Table>
             {licenseAuditLogs.length === 0 && (
-              <p className="text-center text-gray-500 py-8">
+              <p className="text-center text-muted-foreground py-8">
                 No history events found for this license.
               </p>
             )}
@@ -1400,7 +1403,7 @@ function NewLicenseModal({ clinics, onSave, onCancel }: NewLicenseModalProps) {
               </SelectContent>
             </Select>
             {selectedTemplate && (
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Template applied:{" "}
                 {
                   LICENSE_TEMPLATES.find((t) => t.id === selectedTemplate)
@@ -1462,7 +1465,7 @@ function NewLicenseModal({ clinics, onSave, onCancel }: NewLicenseModalProps) {
             </p>
           )}
           {formData.pricingPlanId && selectedPlanDescription && (
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {selectedPlanDescription}
             </p>
           )}
