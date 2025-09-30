@@ -27,6 +27,16 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/components/ui/toast-system";
 import { PRICING_PLANS, formatCurrency, type PricingPlan } from "@/lib/pricing";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -108,7 +118,8 @@ export default function GlobalSettings() {
   const [loadingPricingPlans, setLoadingPricingPlans] = useState(true);
   const [twoFactorSecret, setTwoFactorSecret] = useState<string>("");
   const [showTwoFactorSetup, setShowTwoFactorSetup] = useState(false);
-  const { showError, showSuccess } = useToast();
+  const [confirmDisable2FA, setConfirmDisable2FA] = useState(false);
+  const { showError, showSuccess, showWarning } = useToast();
   const { twoFactorEnabled, enableTwoFactor, disableTwoFactor } = useAuth();
 
   useEffect(() => {
@@ -1092,7 +1103,9 @@ export default function GlobalSettings() {
               <div className="space-y-0.5">
                 <Label>Two-Factor Authentication</Label>
                 <div className="text-sm text-gray-500">
-                  Add an extra layer of security to your account
+                  {twoFactorEnabled
+                    ? "Your account is protected with two-factor authentication. Disabling requires confirmation."
+                    : "Add an extra layer of security to your account with time-based one-time passwords"}
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -1112,9 +1125,8 @@ export default function GlobalSettings() {
                       setTwoFactorSecret(secret);
                       setShowTwoFactorSetup(true);
                     } else {
-                      disableTwoFactor();
-                      setShowTwoFactorSetup(false);
-                      setTwoFactorSecret("");
+                      // Require confirmation to disable 2FA
+                      setConfirmDisable2FA(true);
                     }
                   }}
                 />
@@ -1162,14 +1174,67 @@ export default function GlobalSettings() {
 
             {twoFactorEnabled && !showTwoFactorSetup && (
               <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="h-4 w-4 text-green-600" />
+                  <span className="font-medium text-green-800">
+                    Security Active
+                  </span>
+                </div>
                 <p className="text-sm text-green-700">
-                  Two-factor authentication is enabled. You'll be prompted for a
-                  verification code on each login.
+                  Two-factor authentication is enabled and protecting your
+                  account. You'll be prompted for a verification code on each
+                  login attempt.
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  🔒 Your account is secure with an additional layer of
+                  protection
                 </p>
               </div>
             )}
           </CardContent>
         </Card>
+
+        {/* Disable 2FA Confirmation Dialog */}
+        <AlertDialog
+          open={confirmDisable2FA}
+          onOpenChange={setConfirmDisable2FA}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Disable Two-Factor Authentication
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to disable two-factor authentication? This
+                will remove the extra layer of security from your account and
+                make it more vulnerable to unauthorized access.
+                <br />
+                <br />
+                <strong>This action cannot be easily undone.</strong> You'll
+                need to re-setup 2FA from scratch if you want to enable it
+                again.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  disableTwoFactor();
+                  setShowTwoFactorSetup(false);
+                  setTwoFactorSecret("");
+                  setConfirmDisable2FA(false);
+                  showWarning(
+                    "2FA Disabled",
+                    "Two-factor authentication has been disabled. Your account is now less secure."
+                  );
+                }}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Disable 2FA
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Advanced License Features */}
         <Card>
