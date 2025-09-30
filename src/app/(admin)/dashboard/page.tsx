@@ -5,6 +5,7 @@ import { Sidebar, Header } from "@/components/layout/AdminLayout";
 import { StatCards } from "@/components/dashboard/StatCards";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import NotificationsPanel from "@/components/dashboard/NotificationsPanel";
+import { DashboardTutorial } from "@/components/tutorial/DashboardTutorial";
 
 interface Clinic {
   id: number;
@@ -151,24 +152,29 @@ function DashboardContent() {
         <Header title="Dashboard Overview" />
         <main className="flex-1 overflow-y-auto p-6">
           <div className="space-y-6">
-            <StatCards
-              totalClinics={stats.totalClinics}
-              activeLicenses={stats.activeLicenses}
-              expiredLicenses={stats.expiredLicenses}
-              expiringSoon={stats.expiringSoon}
-            />
+            <div data-tutorial="stat-cards">
+              <StatCards
+                totalClinics={stats.totalClinics}
+                activeLicenses={stats.activeLicenses}
+                expiredLicenses={stats.expiredLicenses}
+                expiringSoon={stats.expiringSoon}
+              />
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2" data-tutorial="dashboard-charts">
                 <DashboardCharts
                   licenseData={licenseDistribution}
                   expirationData={expirationTimeline}
                 />
               </div>
-              <div>
+              <div data-tutorial="notifications-panel">
                 <NotificationsPanel />
               </div>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow">
+            <div
+              className="bg-white p-6 rounded-lg shadow"
+              data-tutorial="recent-clinics"
+            >
               <h3 className="text-lg font-semibold mb-4">
                 Recent Clinics ({clinics.length})
               </h3>
@@ -214,5 +220,9 @@ function DashboardContent() {
 }
 
 export default function Dashboard() {
-  return <DashboardContent />;
+  return (
+    <DashboardTutorial>
+      <DashboardContent />
+    </DashboardTutorial>
+  );
 }
