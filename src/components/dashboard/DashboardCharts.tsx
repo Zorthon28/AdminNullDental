@@ -89,7 +89,7 @@ const DashboardCharts = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-background">
       {/* License Type Distribution Chart */}
-      <Card className="bg-white">
+      <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -142,7 +142,7 @@ const DashboardCharts = ({
       </Card>
 
       {/* Support Expiration Timeline Chart */}
-      <Card className="bg-white">
+      <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>

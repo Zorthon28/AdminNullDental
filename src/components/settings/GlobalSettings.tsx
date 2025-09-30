@@ -351,16 +351,16 @@ export default function GlobalSettings() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 bg-gray-50 min-h-screen p-6">
+      <div className="space-y-6 bg-background min-h-screen p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 bg-gray-50 min-h-screen p-6">
+    <div className="space-y-6 bg-background min-h-screen p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

@@ -223,7 +223,7 @@ export default function NotificationsPanel() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <Card className="w-full h-full bg-white shadow-md">
+    <Card className="w-full h-full">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-xl font-semibold flex items-center">
           <Bell className="mr-2 h-5 w-5" />

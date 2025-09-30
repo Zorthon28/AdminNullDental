@@ -131,13 +131,13 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-gray-50">
+      <div className="flex h-screen bg-background">
         <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header title="Dashboard Overview" />
           <main className="flex-1 overflow-y-auto p-6">
             <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
             </div>
           </main>
         </div>
@@ -146,7 +146,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-background">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header title="Dashboard Overview" />
@@ -172,10 +172,10 @@ function DashboardContent() {
               </div>
             </div>
             <div
-              className="bg-white p-6 rounded-lg shadow"
+              className="bg-card p-6 rounded-lg shadow border border-border"
               data-tutorial="recent-clinics"
             >
-              <h3 className="text-lg font-semibold mb-4">
+              <h3 className="text-lg font-semibold mb-4 text-foreground">
                 Recent Clinics ({clinics.length})
               </h3>
               <ul className="space-y-2 max-h-64 overflow-y-auto">
@@ -185,28 +185,30 @@ function DashboardContent() {
                     className="flex justify-between items-center"
                   >
                     <div>
-                      <span className="font-medium">{clinic.name}</span>
-                      <span className="text-gray-500 ml-2">
+                      <span className="font-medium text-foreground">
+                        {clinic.name}
+                      </span>
+                      <span className="text-muted-foreground ml-2">
                         ({clinic.domain})
                       </span>
                       <span
                         className={`ml-2 px-2 py-1 rounded text-xs ${
                           clinic.status === "Active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                            : "bg-muted text-muted-foreground"
                         }`}
                       >
                         {clinic.status}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-muted-foreground">
                       {clinic.licenses.length} license
                       {clinic.licenses.length !== 1 ? "s" : ""}
                     </div>
                   </li>
                 ))}
                 {clinics.length > 10 && (
-                  <li className="text-center text-gray-500 text-sm py-2">
+                  <li className="text-center text-muted-foreground text-sm py-2">
                     And {clinics.length - 10} more clinics...
                   </li>
                 )}
